@@ -12,3 +12,16 @@ deploy:
 
 logs:
 	heroku logs --app metropolia-it-sales --tail
+
+redis-users:
+	heroku redis:cli REDIS_URL --app metropolia-it-sales --confirm metropolia-it-sales
+
+redis-objects:
+	heroku redis:cli HEROKU_REDIS_MAUVE_URL --app metropolia-it-sales --confirm metropolia-it-sales
+
+watch:
+	watchmedo shell-command \
+	    --patterns="*.py" \
+	    --recursive \
+	    --command='./bot.py' \
+	    .
