@@ -14,7 +14,7 @@ You go to the bot live address mentioned above, and click on `Start`. The button
    * Use `/add_monitor` command and follow the instructions to add a monitor.
    * Use `/remove_monitor` command to remove a monitor with its unique `id`.
 * Use `/me` command to check your public Telegram information + your `admin`/`student` status.
-* Finally, use `/help` whenever you're stuck.
+* Finally, use `/help` if need be.
 
 #### Technical implementation
 Application is hosted on Heroku, and written with `Python 3.5`. The main script which is run by a `worker` process in Heroku's environment is `bot.py`. There are some rules defined in `Makefile` to simplify my frequent command executions.
