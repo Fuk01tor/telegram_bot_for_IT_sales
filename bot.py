@@ -9,6 +9,7 @@ from db_utils import (
     save_monitor,
     get_monitors,
     remove_monitor,
+    reserve_monitor,
 )
 from markup_utils import (
     two_option_markup,
@@ -24,7 +25,8 @@ monitor_dict = dict()
 def start_handler(message):
     chat_id = message.chat.id
     admin_or_student = two_option_markup('/admin', '/student')
-    reply = "Hiyaa {}! What's your role?".format(message.from_user.first_name)
+    reply = "Hiyaa {}! for help, type /help\nWhat's your role?".format(
+        message.from_user.first_name)
     bot.send_message(chat_id, reply, reply_markup=admin_or_student)
 
 
@@ -46,7 +48,7 @@ def admin_handler(message):
 def admin_confirm_handler(message):
     chat_id = message.chat.id
     secret_word = message.text
-    if (secret_word == os.environ['SECRET_WORD']):
+    if (secret_word.lower() == os.environ['SECRET_WORD']):
         save_user(message, admin=True)
         bot.send_message(chat_id, "You've been promoted to an admin.")
         help_me(message)
@@ -182,6 +184,33 @@ def remove_monitor_confirm_handler(message):
         bot.send_message(
             chat_id,
             'Monitor {} was removed from the stock'.format(monitor_id))
+    except Exception as e:
+        bot.send_message(chat_id, str(e))
+    update_monitors_handler(message)
+
+
+@bot.message_handler(commands=['reserve_monitor'])
+def reserve_monitor_handler(message):
+    chat_id = message.chat.id
+    user = get_user(message)
+    if (user['admin']):
+        bot.send_message(chat_id, 'Forbiddon operation!')
+        help_me(message)
+        return
+    msg = bot.send_message(chat_id,
+                           "Enter id of monitor you'd like to reserve")
+    bot.register_next_step_handler(msg, reserve_monitor_confirm_handler)
+
+
+def reserve_monitor_confirm_handler(message):
+    chat_id = message.chat.id
+    monitor_id = message.text
+    try:
+        reserve_monitor(monitor_id, message)
+        bot.send_message(
+            chat_id,
+            'Monitor {} was reserved for you, {}'.format(
+                monitor_id, message.from_user.first_name))
     except Exception as e:
         bot.send_message(chat_id, str(e))
     update_monitors_handler(message)

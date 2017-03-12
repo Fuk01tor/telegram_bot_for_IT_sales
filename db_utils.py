@@ -30,10 +30,11 @@ def save_monitor(brand=None, manufacture_year=None, price=None):
     })
 
 
-def readable_monitor_info(unique_id=None, brand=None,
-                          manufacture_year=None, price=None):
-    return """{}: Brand: {} Manufacture year: {} Price: {}\n""".format(
-        unique_id, brand, manufacture_year, price)
+def readable_monitor_info(unique_id=None, brand=None, manufacture_year=None,
+                          price=None, reserved_for=None):
+    return """
+{}: Brand: {} Manufacture year: {} Price: {} Reserved for: {}\n""".format(
+        unique_id, brand, manufacture_year, price, reserved_for)
 
 
 def get_monitors():
@@ -46,11 +47,28 @@ def get_monitors():
             unique_id=key,
             brand=values['brand'],
             manufacture_year=values['manufacture_year'],
-            price=values['price'])
+            price=values['price'],
+            reserved_for=values.get('reserved_for', 'No one'))
     return result
 
 
 def remove_monitor(unique_id):
     if (not db.Monitors.exists(unique_id)):
-        raise Exception('{} does not exist in the stock'.format(unique_id))
+        raise Exception(
+            'Monitor {} does not exist in the stock'.format(unique_id))
     db.Monitors.delete(unique_id)
+
+
+def reserve_monitor(unique_id, message):
+    if (not db.Monitors.exists(unique_id)):
+        raise Exception(
+            'Monitor {} does not exist in the stock'.format(unique_id))
+    monitor = db.Monitors.hgetall(unique_id)
+    if (monitor.get('reserved')):
+        raise Exception(
+            'Monitor {} is already reserved'.format(unique_id))
+
+    db.Monitors.hmset(unique_id, {
+        'reserved': True,
+        'reserved_for': message.from_user.first_name,
+    })
