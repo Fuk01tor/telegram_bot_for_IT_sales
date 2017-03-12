@@ -16,7 +16,7 @@ logs:
 redis-users:
 	heroku redis:cli REDIS_URL --app metropolia-it-sales --confirm metropolia-it-sales
 
-redis-objects:
+redis-monitors:
 	heroku redis:cli HEROKU_REDIS_MAUVE_URL --app metropolia-it-sales --confirm metropolia-it-sales
 
 watch:
